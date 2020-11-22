@@ -10,7 +10,7 @@ logging_folder = "__test_dist__"
 kwargs = {"fixed_epoch": 3}
 
 
-def test_benchmark(self) -> None:
+def test_benchmark() -> None:
     benchmark_folder = os.path.join(logging_folder, "__test_benchmark__")
     x, y = TabularDataset.iris().xy
     benchmark = Benchmark(
@@ -36,7 +36,7 @@ def test_benchmark(self) -> None:
     benchmark.save(saving_folder)
     loaded_benchmark, loaded_results = Benchmark.load(saving_folder)
     msg2 = loaded_results.comparer.log_statistics()
-    self.assertEqual(msg1, msg2)
+    assert msg1 == msg2
     cflearn._rmtree(logging_folder)
 
 
