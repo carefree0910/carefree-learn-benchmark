@@ -5,6 +5,7 @@ import unittest
 import numpy as np
 
 from typing import Dict
+from cflearn_benchmark import Benchmark
 from scipy.sparse import csr_matrix
 from cftool.ml import patterns_type
 from cftool.ml import Tracker
@@ -68,7 +69,7 @@ class TestOpenML(unittest.TestCase):
             ]
 
             # cflearn benchmark
-            benchmark = cflearn.Benchmark(
+            benchmark = Benchmark(
                 task_name,
                 "clf",
                 models=["fcnn", "tree_dnn"],
@@ -130,7 +131,7 @@ class TestOpenML(unittest.TestCase):
     def test2(self) -> None:
         for task_name in self.task_names:
             saving_folder = self._get_benchmark_saving_folder(task_name)
-            _, results = cflearn.Benchmark.load(saving_folder)
+            _, results = Benchmark.load(saving_folder)
             loaded_msg = results.comparer.log_statistics(verbose_level=None)
             self.assertEqual(TestOpenML.messages[task_name], loaded_msg)
         cflearn._rmtree(self.logging_folder)
