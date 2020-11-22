@@ -43,7 +43,7 @@ class Benchmark(LoggingMixin):
         task_type: task_type_type,
         *,
         temp_folder: Optional[str] = None,
-        project_name: str = "carefree-learn",
+        project_name: str = "carefree-learn-benchmark",
         models: Union[str, List[str]] = "fcnn",
         increment_config: Optional[Dict[str, Any]] = None,
         data_config: Optional[Dict[str, Any]] = None,

@@ -25,7 +25,7 @@ class TestOpenML(unittest.TestCase):
 
     num_jobs = 2
     num_repeat = 3
-    project_name = "carefree-learn"
+    project_name = "carefree-learn-benchmark"
     logging_folder = "__test_openml__"
     openml_indices = [38, 389]
     # openml_indices = [38, 46, 179, 184, 389, 554, 772, 917, 1049, 1111, 1120, 1128, 293]
