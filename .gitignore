@@ -4,6 +4,7 @@
 .vscode/*
 _*/
 build/*
-carefree_learn.egg-info
+carefree_learn_benchmark.egg-info
 pip-wheel-metadata
 **/.ipynb_checkpoints/*
+**/mlruns/*
