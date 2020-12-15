@@ -212,8 +212,9 @@ class Benchmark:
         return self._k_core(KRandom(k, num_test, dataset), load_tasks, predict_config)
 
     def save(self, export_folder: str, *, compress: bool = True) -> "Benchmark":
-        experiment = self.experiment
-        if experiment is None:
+        if self.data is None:
+            raise ValueError("`data` is not yet defined")
+        if self.experiment is None:
             raise ValueError("`experiment` is not yet defined")
         abs_folder = os.path.abspath(export_folder)
         base_folder = os.path.dirname(abs_folder)
@@ -224,6 +225,13 @@ class Benchmark:
             else:
                 task_type_value = self.task_type.value
             # configs
+            saving_results = self.results
+            if saving_results is not None:
+                saving_results = BenchmarkResults(
+                    saving_results.best_configs,
+                    saving_results.best_methods,
+                    None,
+                )
             Saving.save_dict(
                 {
                     "task_name": self.task_name,
@@ -234,11 +242,7 @@ class Benchmark:
                     "data_folders": self.data_folders,
                     "configs": self.configs,
                     "predict_config": self.predict_config,
-                    "results": BenchmarkResults(
-                        self.results.best_configs,
-                        self.results.best_methods,
-                        None,
-                    ),
+                    "results": saving_results,
                     "mlflow_task_name": self.mlflow_task_name,
                     "data_folder2workplaces": self.data_folder2workplaces,
                     "workplace2model_setting": self.workplace2model_setting,
@@ -251,7 +255,7 @@ class Benchmark:
             self.data.save(data_folder, compress=False)
             # experiment
             experiment_folder = os.path.join(abs_folder, self.experiment_name)
-            experiment.save(experiment_folder, compress=False)
+            self.experiment.save(experiment_folder, compress=False)
             # compress
             if compress:
                 Saving.compress(abs_folder, remove_original=True)
