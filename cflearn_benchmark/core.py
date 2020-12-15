@@ -100,19 +100,22 @@ class Benchmark:
                     if not self.use_mlflow:
                         mlflow_config = None
                     else:
+                        mlflow_params = shallow_copy_dict(config)
+                        mlflow_params["model"] = model
                         mlflow_config = {
                             "task_name": self.mlflow_task_name,
                             "run_name": f"{model_setting}_{iterator_name}",
+                            "mlflow_params": mlflow_params,
                         }
                     increment_config = shallow_copy_dict(self.increment_config)
                     increment_config["mlflow_config"] = mlflow_config
-                    config = update_dict(increment_config, config)
-                    self.configs.setdefault(model_setting, config)
+                    kwargs = update_dict(increment_config, shallow_copy_dict(config))
+                    self.configs.setdefault(model_setting, kwargs)
                     workplace = self.experiment.add_task(
                         model=model,
                         data_folder=data_folder,
                         root_workplace=self.temp_folder,
-                        config=config,
+                        config=kwargs,
                     )
                     self.workplace2model_setting[workplace] = model_setting
                     local_workplaces.append(workplace)
