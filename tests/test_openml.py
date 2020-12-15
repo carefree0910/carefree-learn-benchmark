@@ -72,9 +72,11 @@ class TestOpenML(unittest.TestCase):
             benchmark = Benchmark(
                 task_name,
                 "clf",
+                num_jobs=self.num_jobs,
                 models=["fcnn", "tree_dnn"],
                 temp_folder=os.path.join(
-                    self.logging_folder, f"__test_openml_{openml_id}__"
+                    self.logging_folder,
+                    f"__test_openml_{openml_id}__",
                 ),
                 increment_config={
                     "min_epoch": 1,
@@ -83,13 +85,7 @@ class TestOpenML(unittest.TestCase):
                     "data_config": {"categorical_columns": categorical_columns},
                 },
             )
-            results = benchmark.k_random(
-                self.num_repeat,
-                0.1,
-                *data.converted.xy,
-                run_tasks=True,
-                num_jobs=self.num_jobs,
-            )
+            results = benchmark.k_random(self.num_repeat, 0.1, *data.converted.xy)
             msg = results.comparer.log_statistics(verbose_level=None)
             TestOpenML.messages[task_name] = msg
             benchmark.save(self._get_benchmark_saving_folder(task_name))
@@ -97,12 +93,12 @@ class TestOpenML(unittest.TestCase):
             comparer_list.append(results.comparer.select(best_methods))
 
             # sklearn
-            data_tasks = benchmark.data_tasks
-            for data_task in data_tasks:
-                assert isinstance(data_task, cflearn.Task)
+            exp = benchmark.experiment
+            data_folders = benchmark.data_folders
+            for data_folder in data_folders:
                 sklearn_patterns: patterns_type = {}
-                x_tr, y_tr = data_task.fetch_data()
-                x_te, y_te = data_task.fetch_data("_te")
+                x_tr, y_tr = exp.fetch_data(data_folder=data_folder)
+                x_te, y_te = exp.fetch_data("_te", data_folder=data_folder)
                 assert isinstance(y_tr, np.ndarray)
                 for base in sk_bases:
                     clf = base()
@@ -131,8 +127,8 @@ class TestOpenML(unittest.TestCase):
     def test2(self) -> None:
         for task_name in self.task_names:
             saving_folder = self._get_benchmark_saving_folder(task_name)
-            _, results = Benchmark.load(saving_folder)
-            loaded_msg = results.comparer.log_statistics(verbose_level=None)
+            benchmark = Benchmark.load(saving_folder)
+            loaded_msg = benchmark.results.comparer.log_statistics(verbose_level=None)
             self.assertEqual(TestOpenML.messages[task_name], loaded_msg)
         cflearn._rmtree(self.logging_folder)
 
