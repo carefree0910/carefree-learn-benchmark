@@ -79,11 +79,10 @@ class TestOpenML(unittest.TestCase):
                     f"__test_openml_{openml_id}__",
                 ),
                 increment_config={
-                    "min_epoch": 1,
-                    "num_epoch": 2,
-                    "max_epoch": 4,
+                    "fixed_epoch": 2,
                     "data_config": {"categorical_columns": categorical_columns},
                 },
+                use_cuda=False,
             )
             results = benchmark.k_random(self.num_repeat, 0.1, *data.converted.xy)
             msg = results.comparer.log_statistics(verbose_level=None)
