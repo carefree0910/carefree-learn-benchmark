@@ -1,5 +1,6 @@
 import os
 import cflearn
+import platform
 import unittest
 
 import numpy as np
@@ -23,8 +24,8 @@ from sklearn.linear_model import LogisticRegression
 class TestOpenML(unittest.TestCase):
     Experiment.suppress_warnings()
 
-    num_jobs = 2
     num_repeat = 3
+    num_jobs = 0 if platform.system() == "Linux" else 2
     project_name = "carefree-learn-benchmark"
     logging_folder = "__test_openml__"
     openml_indices = [38, 389]
@@ -82,7 +83,6 @@ class TestOpenML(unittest.TestCase):
                     "fixed_epoch": 2,
                     "data_config": {"categorical_columns": categorical_columns},
                 },
-                use_cuda=False,
             )
             results = benchmark.k_random(self.num_repeat, 0.1, *data.converted.xy)
             msg = results.comparer.log_statistics(verbose_level=None)
@@ -95,7 +95,7 @@ class TestOpenML(unittest.TestCase):
             exp = benchmark.experiment
             data_folders = benchmark.data_folders
             for data_folder in data_folders:
-                sklearn_patterns: patterns_type = {}
+                sklearn_patterns: Dict[str, patterns_type] = {}
                 x_tr, y_tr = exp.fetch_data(data_folder=data_folder)
                 x_te, y_te = exp.fetch_data("_te", data_folder=data_folder)
                 assert isinstance(y_tr, np.ndarray)
