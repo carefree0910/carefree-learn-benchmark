@@ -19,6 +19,7 @@ from cfdata.tabular import TabularDataset
 from cflearn.dist import Experiment
 from cflearn.pipeline import Pipeline
 from cftool.ml.utils import Comparer
+from cflearn.misc.toolkit import inject_mlflow_stuffs
 
 
 class BenchmarkResults(NamedTuple):
@@ -97,19 +98,14 @@ class Benchmark:
                     model_benchmarks = cflearn.Zoo(model).benchmarks
                 for model_type, config in model_benchmarks.items():
                     model_setting = f"{model}_{model_type}"
-                    if not self.use_mlflow:
-                        mlflow_config = None
-                    else:
-                        mlflow_params = shallow_copy_dict(config)
-                        mlflow_params["model"] = model
-                        mlflow_config = {
+                    increment_config = shallow_copy_dict(self.increment_config)
+                    kwargs = update_dict(increment_config, shallow_copy_dict(config))
+                    if self.use_mlflow:
+                        kwargs["mlflow_config"] = {
                             "task_name": self.mlflow_task_name,
                             "run_name": f"{model_setting}_{iterator_name}",
-                            "mlflow_params": mlflow_params,
                         }
-                    increment_config = shallow_copy_dict(self.increment_config)
-                    increment_config["mlflow_config"] = mlflow_config
-                    kwargs = update_dict(increment_config, shallow_copy_dict(config))
+                        inject_mlflow_stuffs(model, config=kwargs)
                     self.configs.setdefault(model_setting, kwargs)
                     workplace = self.experiment.add_task(
                         model=model,
