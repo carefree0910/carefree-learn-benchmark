@@ -9,7 +9,7 @@ setup(
     name="carefree-learn-benchmark",
     version=VERSION,
     packages=find_packages(exclude=("tests",)),
-    install_requires=["carefree-learn>=0.1.8"],
+    install_requires=["carefree-learn>=0.1.13"],
     author="carefree0910",
     author_email="syameimaru_kurumi@pku.edu.cn",
     url="https://github.com/carefree0910/carefree-learn-benchmark",
