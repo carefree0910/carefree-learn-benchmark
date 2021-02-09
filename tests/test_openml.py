@@ -55,7 +55,7 @@ class TestOpenML(unittest.TestCase):
                 ]
             data = TabularData(
                 process_methods=None,
-                valid_columns=list(range(x.shape[1])),
+                valid_columns=set(range(x.shape[1])),
                 categorical_columns=categorical_columns,
             )
             data.read(x, y.reshape([-1, 1]))
@@ -75,10 +75,6 @@ class TestOpenML(unittest.TestCase):
                 "clf",
                 num_jobs=self.num_jobs,
                 models=["fcnn", "tree_dnn"],
-                temp_folder=os.path.join(
-                    self.logging_folder,
-                    f"__test_openml_{openml_id}__",
-                ),
                 increment_config={
                     "fixed_epoch": 2,
                     "data_config": {"categorical_columns": categorical_columns},
