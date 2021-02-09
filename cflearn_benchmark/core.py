@@ -40,8 +40,8 @@ class Benchmark:
         use_mlflow: bool = True,
         temp_folder: Optional[str] = None,
         models: Union[str, List[str]] = "fcnn",
-        data_config: Optional[Dict[str, Any]] = None,
-        read_config: Optional[Dict[str, Any]] = None,
+        pre_process_data_config: Optional[Dict[str, Any]] = None,
+        pre_process_read_config: Optional[Dict[str, Any]] = None,
         increment_config: Optional[Dict[str, Any]] = None,
         benchmarks: Optional[Dict[str, Dict[str, Dict[str, Any]]]] = None,
         num_jobs: int = 4,
@@ -64,8 +64,8 @@ class Benchmark:
         self.task_type = task_type
         self.mlflow_task_name = f"{task_name}_{timestamp()}"
 
-        self.data_config = data_config or {}
-        self.read_config = read_config or {}
+        self.pre_process_data_config = pre_process_data_config or {}
+        self.pre_process_read_config = pre_process_read_config or {}
         self.increment_config = increment_config or {}
         self.benchmarks = benchmarks or {}
 
@@ -137,11 +137,10 @@ class Benchmark:
         return Comparer.merge(comparer_list)
 
     def _run_tasks(self, load_tasks: bool) -> BenchmarkResults:
-        experiment = self.experiment
-        if experiment is None:
+        if self.experiment is None:
             raise ValueError("`experiment` is not yet defined")
         task_loader = cflearn.task_loader if load_tasks else None
-        results = experiment.run_tasks(task_loader=task_loader)
+        results = self.experiment.run_tasks(task_loader=task_loader)
         pipeline_dict = results.pipeline_dict
         comparer = self._merge_comparer(pipeline_dict)
         best_methods = comparer.best_methods
@@ -152,12 +151,12 @@ class Benchmark:
         return BenchmarkResults(best_configs, best_methods, comparer)
 
     def _pre_process(self, x: data_type, y: data_type = None) -> TabularDataset:
-        data_config = shallow_copy_dict(self.data_config)
+        data_config = shallow_copy_dict(self.pre_process_data_config)
         task_type = data_config.pop("task_type", None)
         if task_type is not None:
             assert parse_task_type(task_type) is parse_task_type(self.task_type)
-        self.data = TabularData.simple(self.task_type, **data_config)
-        self.data.read(x, y, **self.read_config)
+        self.data = TabularData.simple(self.task_type, simplify=True, **data_config)
+        self.data.read(x, y, **self.pre_process_read_config)
         return self.data.to_dataset()
 
     def _data_folder(self, i: int) -> str:
