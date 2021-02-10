@@ -40,7 +40,7 @@ class TestOpenML(unittest.TestCase):
     def test1(self) -> None:
         for openml_id, task_name in zip(self.openml_indices, self.task_names):
             # preparation
-            bunch = fetch_openml(data_id=openml_id)
+            bunch = fetch_openml(data_id=openml_id, as_frame=False)
             x, y = bunch.data, bunch.target
             if isinstance(x, csr_matrix):
                 x = x.toarray()
