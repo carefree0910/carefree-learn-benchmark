@@ -24,11 +24,11 @@ from sklearn.linear_model import LogisticRegression
 class TestOpenML(unittest.TestCase):
     Experiment.suppress_warnings()
 
-    num_repeat = 3
+    num_repeat = 2
     num_jobs = 0 if platform.system() == "Linux" else 2
     project_name = "carefree-learn-benchmark"
     logging_folder = "__test_openml__"
-    openml_indices = [38, 389]
+    openml_indices = [38]
     # openml_indices = [38, 46, 179, 184, 389, 554, 772, 917, 1049, 1111, 1120, 1128, 293]
     task_names = [f"openml_{openml_id}" for openml_id in openml_indices]
     messages: Dict[str, str] = {}
